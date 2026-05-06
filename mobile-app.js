@@ -228,6 +228,7 @@ function GoalScreen({ goal, setGoal, years, setYears, onNext }) {
             display: "flex", justifyContent: "space-between",
             marginTop: 6, fontSize: 11, color: C.ink2,
             fontFamily: '"IBM Plex Mono", monospace',
+            padding: "0 14px",
           }}>
             <span>1y</span><span>10y</span><span>20y</span><span>30y</span>
           </div>

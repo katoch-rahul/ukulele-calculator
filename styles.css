@@ -202,27 +202,54 @@ body {
   border: 2px solid var(--paper);
 }
 
-/* mobile slider — shrunk by thumb-radius so track matches label range */
+/* mobile slider — track shrunk to label range, filled portion in accent color */
 .mobile-slider {
   -webkit-appearance: none; appearance: none;
   display: block;
   width: calc(100% - 28px);
   margin: 0 14px;
-  height: 4px;
-  background: rgba(120,120,128,0.2);
-  border-radius: 2px;
+  height: 6px;
+  border-radius: 3px;
   outline: none;
+  touch-action: none;
+  -ms-touch-action: none;
+}
+.mobile-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: transparent;
+}
+.mobile-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: transparent;
 }
 .mobile-slider::-webkit-slider-thumb {
   -webkit-appearance: none; appearance: none;
   width: 28px; height: 28px; border-radius: 50%;
   background: #fff; cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.22), 0 0 0 0.5px rgba(0,0,0,0.06);
+  margin-top: -11px;
+  box-shadow:
+    0 0 0 0.5px rgba(0,0,0,0.06),
+    0 3px 8px rgba(0,0,0,0.15),
+    0 1px 1px rgba(0,0,0,0.16);
+  transition: transform 120ms ease;
+}
+.mobile-slider::-webkit-slider-thumb:active {
+  transform: scale(1.08);
 }
 .mobile-slider::-moz-range-thumb {
   width: 28px; height: 28px; border-radius: 50%;
   background: #fff; border: none; cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.22);
+  box-shadow:
+    0 0 0 0.5px rgba(0,0,0,0.06),
+    0 3px 8px rgba(0,0,0,0.15),
+    0 1px 1px rgba(0,0,0,0.16);
+}
+.mobile-slider::-moz-range-progress {
+  height: 6px;
+  border-radius: 3px;
+  background: #34A853;
 }
 .slider-scale, .rate-scale {
   display: flex; justify-content: space-between;

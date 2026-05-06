@@ -8,6 +8,7 @@ const C = {
   ink: "#000000",
   ink2: "rgba(60,60,67,0.6)",
   ink3: "rgba(60,60,67,0.18)",
+  trackOff: "rgba(120,120,128,0.2)",
   accent: "#34A853",
   accentSoft: "#E8F5EC",
   warn: "#FF9500",
@@ -29,6 +30,14 @@ const sipForFV = (FV, r, t) => {
 };
 const lumpsumForFV = (FV, r, t) => FV / Math.pow(1 + r / 100, t);
 
+// ── slider fill: green portion left of thumb, gray right ──
+const sliderFill = (val, min, max) => {
+  const pct = Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100));
+  return {
+    background: `linear-gradient(to right, ${C.accent} 0%, ${C.accent} ${pct}%, ${C.trackOff} ${pct}%, ${C.trackOff} 100%)`,
+  };
+};
+
 // ── shared UI primitives ──
 const card = (extra = {}) => ({
   background: C.card, borderRadius: 16,
@@ -38,7 +47,7 @@ const card = (extra = {}) => ({
 const cardLabel = () => ({
   fontSize: 11, fontWeight: 600, letterSpacing: 0.5,
   textTransform: "uppercase", color: C.ink2,
-  padding: "14px 16px 6px",
+  padding: "12px 16px 4px",
 });
 
 const chip = (on) => ({
@@ -52,20 +61,29 @@ const chip = (on) => ({
 const preset = (on) => ({
   background: on ? C.accentSoft : C.card,
   border: on ? `1.5px solid ${C.accent}` : `1px solid ${C.ink3}`,
-  borderRadius: 14, padding: "12px 14px",
+  borderRadius: 14, padding: "10px 14px",
   textAlign: "left", fontFamily: "inherit", cursor: "pointer",
 });
 
-const btnPrimary = () => ({
-  flex: 2, background: C.ink, color: "#fff",
-  border: "none", borderRadius: 14, padding: "16px",
+const btnPrimary = (disabled) => ({
+  flex: 2, background: disabled ? C.ink3 : C.ink, color: "#fff",
+  border: "none", borderRadius: 14, padding: "14px",
   fontSize: 17, fontWeight: 600, fontFamily: "inherit",
 });
 
 const btnSecondary = () => ({
   flex: 1, background: "rgba(120,120,128,0.12)", color: C.ink,
-  border: "none", borderRadius: 14, padding: "16px",
+  border: "none", borderRadius: 14, padding: "14px",
   fontSize: 17, fontWeight: 600, fontFamily: "inherit",
+});
+
+// shared screen wrapper — flex column that fills the remaining viewport
+const screen = () => ({
+  flex: 1,
+  display: "flex", flexDirection: "column",
+  padding: "16px 16px 20px",
+  gap: 12,
+  minHeight: 0,
 });
 
 // ── Ukulele logo ──
@@ -98,10 +116,10 @@ function UkuleleLogo({ size = 22 }) {
 function NavBar({ step, onBack }) {
   return (
     <div style={{
-      position: "sticky", top: 0, zIndex: 10,
+      flexShrink: 0,
       background: C.bg,
       borderBottom: `0.5px solid ${C.ink3}`,
-      padding: "12px 16px",
+      padding: "10px 16px",
       display: "flex", alignItems: "center", justifyContent: "space-between",
     }}>
       <div style={{ width: 60 }}>
@@ -115,7 +133,6 @@ function NavBar({ step, onBack }) {
           </button>
         )}
       </div>
-
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <UkuleleLogo size={18} />
         <span style={{
@@ -123,7 +140,6 @@ function NavBar({ step, onBack }) {
           fontSize: 18, color: C.ink,
         }}>Ukulele Calculator</span>
       </div>
-
       <div style={{ width: 60, textAlign: "right" }}>
         <span style={{
           fontSize: 12, color: C.ink2,
@@ -137,7 +153,10 @@ function NavBar({ step, onBack }) {
 // ── Progress dots ──
 function ProgressDots({ step }) {
   return (
-    <div style={{ display: "flex", justifyContent: "center", gap: 6, padding: "14px 0 2px" }}>
+    <div style={{
+      flexShrink: 0,
+      display: "flex", justifyContent: "center", gap: 6, padding: "10px 0 4px",
+    }}>
       {[0, 1, 2].map((i) => (
         <div key={i} style={{
           width: i === step ? 20 : 6, height: 6, borderRadius: 3,
@@ -149,25 +168,32 @@ function ProgressDots({ step }) {
   );
 }
 
+// ── Page title block ──
+function ScreenTitle({ title, subtitle }) {
+  return (
+    <div style={{ flexShrink: 0 }}>
+      <div style={{ fontSize: 28, fontWeight: 700, letterSpacing: -0.5, lineHeight: 1.1, color: C.ink }}>
+        {title}
+      </div>
+      <div style={{ fontSize: 14, color: C.ink2, marginTop: 4 }}>
+        {subtitle}
+      </div>
+    </div>
+  );
+}
+
 // ── Screen 1: Goal & horizon ──
 function GoalScreen({ goal, setGoal, years, setYears, onNext }) {
   const presets = [100000, 500000, 1000000, 5000000, 10000000];
   return (
-    <div style={{ padding: "24px 16px 32px", display: "flex", flexDirection: "column", gap: 16 }}>
-      <div>
-        <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: -0.5, lineHeight: 1.1, color: C.ink }}>
-          New goal
-        </div>
-        <div style={{ fontSize: 15, color: C.ink2, marginTop: 6 }}>
-          What are you saving toward, and when do you need it?
-        </div>
-      </div>
+    <div style={screen()}>
+      <ScreenTitle title="New goal" subtitle="What are you saving toward, and when do you need it?" />
 
       {/* Goal amount */}
       <div style={card()}>
         <div style={cardLabel()}>Target amount today</div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 4, padding: "4px 16px 14px" }}>
-          <span style={{ fontSize: 34, fontWeight: 600, color: C.ink2 }}>₹</span>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 4, padding: "0 16px 10px" }}>
+          <span style={{ fontSize: 30, fontWeight: 600, color: C.ink2 }}>₹</span>
           <input
             type="number"
             value={goal || ""}
@@ -176,14 +202,14 @@ function GoalScreen({ goal, setGoal, years, setYears, onNext }) {
             inputMode="numeric"
             style={{
               flex: 1, border: "none", outline: "none", background: "transparent",
-              fontSize: 38, fontWeight: 600, color: C.ink,
+              fontSize: 32, fontWeight: 600, color: C.ink,
               fontFamily: "inherit", padding: 0, letterSpacing: -0.5,
             }}
           />
         </div>
         <div style={{
           borderTop: `0.5px solid ${C.ink3}`,
-          padding: "10px 0 14px",
+          padding: "10px 0 12px",
           display: "flex", gap: 8, overflowX: "auto",
           WebkitOverflowScrolling: "touch",
           scrollbarWidth: "none",
@@ -202,7 +228,7 @@ function GoalScreen({ goal, setGoal, years, setYears, onNext }) {
       {/* Time horizon */}
       <div style={card()}>
         <div style={cardLabel()}>Time horizon</div>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 8, padding: "4px 16px 8px" }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 8, padding: "0 16px 6px" }}>
           <input
             type="number"
             value={years || ""}
@@ -211,18 +237,19 @@ function GoalScreen({ goal, setGoal, years, setYears, onNext }) {
             onChange={(e) => setYears(Math.max(1, Math.min(40, parseInt(e.target.value) || 1)))}
             style={{
               border: "none", outline: "none", background: "transparent",
-              fontSize: 38, fontWeight: 600, color: C.ink,
-              fontFamily: "inherit", padding: 0, width: 80,
+              fontSize: 32, fontWeight: 600, color: C.ink,
+              fontFamily: "inherit", padding: 0, width: 70,
             }}
           />
-          <span style={{ fontSize: 22, color: C.ink2, fontWeight: 500 }}>
+          <span style={{ fontSize: 20, color: C.ink2, fontWeight: 500 }}>
             {years === 1 ? "year" : "years"}
           </span>
         </div>
-        <div style={{ padding: "0 16px 16px" }}>
+        <div style={{ padding: "4px 16px 14px" }}>
           <input
             className="mobile-slider"
             type="range" min={1} max={30} value={years}
+            style={sliderFill(years, 1, 30)}
             onChange={(e) => setYears(parseInt(e.target.value))}
           />
           <div style={{
@@ -235,13 +262,16 @@ function GoalScreen({ goal, setGoal, years, setYears, onNext }) {
         </div>
       </div>
 
+      <div style={{ flex: 1 }} />
+
       <button
         onClick={onNext}
         disabled={!goal || !years}
         style={{
           width: "100%", background: (!goal || !years) ? C.ink3 : C.ink,
           color: "#fff", border: "none", borderRadius: 14,
-          padding: "16px", fontSize: 17, fontWeight: 600, fontFamily: "inherit",
+          padding: "14px", fontSize: 17, fontWeight: 600, fontFamily: "inherit",
+          flexShrink: 0,
         }}
       >
         Continue
@@ -262,35 +292,32 @@ function InflationScreen({ goal, years, inflation, setInflation, onNext, onBack 
   const erosion = inflated - goal;
 
   return (
-    <div style={{ padding: "24px 16px 32px", display: "flex", flexDirection: "column", gap: 16 }}>
-      <div>
-        <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: -0.5, lineHeight: 1.1, color: C.ink }}>
-          Apply inflation
-        </div>
-        <div style={{ fontSize: 15, color: C.ink2, marginTop: 6 }}>
-          Today's <b style={{ color: C.ink }}>{fmtINR(goal)}</b> won't buy the same in {years} {years === 1 ? "year" : "years"}.
-        </div>
-      </div>
+    <div style={screen()}>
+      <ScreenTitle
+        title="Apply inflation"
+        subtitle={<>Today's <b style={{ color: C.ink }}>{fmtINR(goal)}</b> won't buy the same in {years} {years === 1 ? "year" : "years"}.</>}
+      />
 
       {/* Inflated value hero */}
       <div style={{
-        background: C.ink, color: "#fff", borderRadius: 18, padding: "20px 18px",
+        background: C.ink, color: "#fff", borderRadius: 18, padding: "16px 18px",
+        flexShrink: 0,
       }}>
         <div style={{
           fontSize: 11, fontWeight: 600, letterSpacing: 0.6,
-          textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 8,
+          textTransform: "uppercase", color: "rgba(255,255,255,0.6)", marginBottom: 6,
         }}>
           You'll actually need
         </div>
         <div style={{
-          fontSize: 42, fontWeight: 700, letterSpacing: -1, lineHeight: 1,
+          fontSize: 38, fontWeight: 700, letterSpacing: -1, lineHeight: 1,
           fontFamily: '"Instrument Serif", Georgia, serif',
           color: C.accent,
         }}>
           {fmtINR(inflated)}
         </div>
         <div style={{
-          marginTop: 12, paddingTop: 12,
+          marginTop: 10, paddingTop: 10,
           borderTop: "0.5px solid rgba(255,255,255,0.15)",
           display: "flex", justifyContent: "space-between",
           fontSize: 13, color: "rgba(255,255,255,0.7)",
@@ -306,45 +333,48 @@ function InflationScreen({ goal, years, inflation, setInflation, onNext, onBack 
           <span>Annual CPI inflation</span>
           <span style={{ color: C.ink, fontWeight: 700, fontSize: 13 }}>{inflation.toFixed(1)}%</span>
         </div>
-        <div style={{ padding: "4px 16px 16px" }}>
+        <div style={{ padding: "6px 16px 14px" }}>
           <input
             className="mobile-slider"
             type="range" min={2} max={8} step={0.1} value={inflation}
+            style={sliderFill(inflation, 2, 8)}
             onChange={(e) => setInflation(parseFloat(e.target.value))}
           />
+          <div style={{
+            display: "flex", justifyContent: "space-between",
+            marginTop: 6, fontSize: 11, color: C.ink2,
+            fontFamily: '"IBM Plex Mono", monospace',
+          }}>
+            <span>2%</span><span>4%</span><span>6%</span><span>8%</span>
+          </div>
         </div>
       </div>
 
       {/* Presets */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
         {inflationPresets.map((p) => {
           const on = Math.abs(inflation - p.v) < 0.05;
           return (
             <button key={p.v} onClick={() => setInflation(p.v)} style={preset(on)}>
               <div style={{
-                fontSize: 22, fontWeight: 700,
+                fontSize: 20, fontWeight: 700,
                 color: on ? C.accent : C.ink,
                 fontFamily: '"Instrument Serif", Georgia, serif',
               }}>
                 {p.v.toFixed(1)}%
               </div>
-              <div style={{ fontSize: 13, fontWeight: 500, color: C.ink, marginTop: 2 }}>{p.label}</div>
-              <div style={{ fontSize: 11, color: C.ink2, marginTop: 1 }}>{p.note}</div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: C.ink, marginTop: 2 }}>{p.label}</div>
+              <div style={{ fontSize: 10, color: C.ink2, marginTop: 1 }}>{p.note}</div>
             </button>
           );
         })}
       </div>
 
-      <div style={{
-        fontSize: 11, color: C.ink2, lineHeight: 1.5,
-        fontFamily: '"IBM Plex Mono", monospace',
-      }}>
-        Source: MoSPI Mar 2026 CPI · RBI Monetary Policy Framework · Economic Survey 2025–26.
-      </div>
+      <div style={{ flex: 1 }} />
 
-      <div style={{ display: "flex", gap: 10 }}>
+      <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
         <button onClick={onBack} style={btnSecondary()}>Back</button>
-        <button onClick={onNext} style={btnPrimary()}>See the plan</button>
+        <button onClick={onNext} style={btnPrimary(false)}>See the plan</button>
       </div>
     </div>
   );
@@ -359,7 +389,7 @@ function PlanScreen({ goal, years, inflation, returnRate, setReturnRate, onBack,
   const earnings = inflated - totalInvested;
 
   const chartPath = useMemo(() => {
-    const W = 300, H = 80;
+    const W = 300, H = 60;
     const i = returnRate / 100 / 12;
     const pts = [];
     for (let t = 0; t <= years; t += years / 40) {
@@ -373,52 +403,47 @@ function PlanScreen({ goal, years, inflation, returnRate, setReturnRate, onBack,
   }, [years, returnRate, inflated, monthly]);
 
   return (
-    <div style={{ padding: "24px 16px 40px", display: "flex", flexDirection: "column", gap: 16 }}>
-      <div>
-        <div style={{ fontSize: 34, fontWeight: 700, letterSpacing: -0.5, lineHeight: 1.1, color: C.ink }}>
-          Your plan
-        </div>
-        <div style={{ fontSize: 15, color: C.ink2, marginTop: 6 }}>
-          To reach <b style={{ color: C.ink }}>{fmtINR(inflated)}</b> in {years} {years === 1 ? "year" : "years"}.
-        </div>
-      </div>
+    <div style={screen()}>
+      <ScreenTitle
+        title="Your plan"
+        subtitle={<>To reach <b style={{ color: C.ink }}>{fmtINR(inflated)}</b> in {years} {years === 1 ? "year" : "years"}.</>}
+      />
 
       {/* Hero SIP card */}
       <div style={{
         background: `linear-gradient(155deg, ${C.accent}, #1e7a38)`,
-        borderRadius: 20, padding: "22px 20px",
-        boxShadow: "0 8px 24px rgba(52,168,83,0.28)",
+        borderRadius: 18, padding: "16px 18px",
+        boxShadow: "0 6px 18px rgba(52,168,83,0.22)",
+        flexShrink: 0,
       }}>
         <div style={{
           fontSize: 11, fontWeight: 600, letterSpacing: 0.6,
-          textTransform: "uppercase", color: "rgba(255,255,255,0.8)", marginBottom: 8,
+          textTransform: "uppercase", color: "rgba(255,255,255,0.8)", marginBottom: 6,
         }}>
           Invest every month
         </div>
         <div style={{
-          fontSize: 44, fontWeight: 700, letterSpacing: -1, lineHeight: 1, color: "#fff",
+          fontSize: 38, fontWeight: 700, letterSpacing: -1, lineHeight: 1, color: "#fff",
           fontFamily: '"Instrument Serif", Georgia, serif',
         }}>
           {fmtFull(monthly)}
         </div>
         <div style={{
-          marginTop: 10, paddingTop: 12,
+          marginTop: 8, paddingTop: 10,
           borderTop: "0.5px solid rgba(255,255,255,0.25)",
           display: "flex", justifyContent: "space-between", fontSize: 13,
         }}>
           <span style={{ color: "rgba(255,255,255,0.8)" }}>at annual return of</span>
           <span style={{ color: "#fff", fontWeight: 700 }}>{returnRate.toFixed(1)}% p.a.</span>
         </div>
-
-        {/* mini chart */}
         <svg viewBox={`0 0 ${chartPath.W} ${chartPath.H}`}
-          style={{ width: "100%", height: 72, marginTop: 14, display: "block" }}>
+          style={{ width: "100%", height: 56, marginTop: 10, display: "block" }}>
           <path d={chartPath.area} fill="rgba(255,255,255,0.18)" />
           <path d={chartPath.line} fill="none" stroke="#fff" strokeWidth={2} />
         </svg>
         <div style={{
           display: "flex", justifyContent: "space-between",
-          fontSize: 10, color: "rgba(255,255,255,0.7)", marginTop: 4,
+          fontSize: 10, color: "rgba(255,255,255,0.7)", marginTop: 2,
           fontFamily: '"IBM Plex Mono", monospace',
         }}>
           <span>Today</span>
@@ -432,10 +457,11 @@ function PlanScreen({ goal, years, inflation, returnRate, setReturnRate, onBack,
           <span>Expected annual return</span>
           <span style={{ color: C.ink, fontWeight: 700, fontSize: 13 }}>{returnRate.toFixed(1)}%</span>
         </div>
-        <div style={{ padding: "4px 16px 12px" }}>
+        <div style={{ padding: "6px 16px 12px" }}>
           <input
             className="mobile-slider"
             type="range" min={4} max={20} step={0.5} value={returnRate}
+            style={sliderFill(returnRate, 4, 20)}
             onChange={(e) => setReturnRate(parseFloat(e.target.value))}
           />
           <div style={{
@@ -453,7 +479,7 @@ function PlanScreen({ goal, years, inflation, returnRate, setReturnRate, onBack,
       </div>
 
       {/* Breakdown */}
-      <div style={{ ...card(), overflow: "hidden" }}>
+      <div style={card()}>
         {[
           { label: "Or, lumpsum today", value: fmtINR(lump), color: C.ink },
           { label: `Total invested over ${years}y`, value: fmtINR(totalInvested), color: C.ink },
@@ -461,25 +487,20 @@ function PlanScreen({ goal, years, inflation, returnRate, setReturnRate, onBack,
         ].map((row, i, arr) => (
           <div key={i} style={{
             display: "flex", justifyContent: "space-between", alignItems: "center",
-            padding: "15px 16px",
+            padding: "11px 16px",
             borderBottom: i < arr.length - 1 ? `0.5px solid ${C.ink3}` : "none",
           }}>
-            <span style={{ fontSize: 15, color: C.ink2 }}>{row.label}</span>
-            <span style={{ fontSize: 17, fontWeight: 600, color: row.color }}>{row.value}</span>
+            <span style={{ fontSize: 14, color: C.ink2 }}>{row.label}</span>
+            <span style={{ fontSize: 16, fontWeight: 600, color: row.color }}>{row.value}</span>
           </div>
         ))}
       </div>
 
-      <div style={{
-        fontSize: 11, color: C.ink2, textAlign: "center",
-        fontFamily: '"IBM Plex Mono", monospace',
-      }}>
-        A planning instrument, not financial advice.
-      </div>
+      <div style={{ flex: 1 }} />
 
-      <div style={{ display: "flex", gap: 10 }}>
+      <div style={{ display: "flex", gap: 10, flexShrink: 0 }}>
         <button onClick={onBack} style={btnSecondary()}>Adjust</button>
-        <button onClick={onReset} style={btnPrimary()}>New goal</button>
+        <button onClick={onReset} style={btnPrimary(false)}>New goal</button>
       </div>
     </div>
   );
@@ -493,20 +514,37 @@ function MobileApp() {
   const [inflation, setInflation] = useState(4.0);
   const [returnRate, setReturnRate] = useState(12.0);
 
+  // Lock body scroll for mobile so each page only fills the viewport
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [step]);
+    const prevHtml = document.documentElement.style.cssText;
+    const prevBody = document.body.style.cssText;
+    document.documentElement.style.height = "100%";
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.height = "100%";
+    document.body.style.overflow = "hidden";
+    document.body.style.background = C.bg;
+    return () => {
+      document.documentElement.style.cssText = prevHtml;
+      document.body.style.cssText = prevBody;
+    };
+  }, []);
 
   const screens = [
     <GoalScreen key="goal" {...{ goal, setGoal, years, setYears }} onNext={() => setStep(1)} />,
     <InflationScreen key="infl" {...{ goal, years, inflation, setInflation }}
       onNext={() => setStep(2)} onBack={() => setStep(0)} />,
     <PlanScreen key="plan" {...{ goal, years, inflation, returnRate, setReturnRate }}
-      onBack={() => setStep(1)} onReset={() => { setStep(0); }} />,
+      onBack={() => setStep(1)} onReset={() => setStep(0)} />,
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: C.bg }}>
+    <div style={{
+      height: "100dvh",
+      maxHeight: "100dvh",
+      background: C.bg,
+      display: "flex", flexDirection: "column",
+      overflow: "hidden",
+    }}>
       <NavBar step={step} onBack={() => setStep(step - 1)} />
       <ProgressDots step={step} />
       {screens[step]}

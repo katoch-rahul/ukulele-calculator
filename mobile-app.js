@@ -440,6 +440,7 @@ function PlanScreen({ goal, years, inflation, returnRate, setReturnRate, onBack,
             display: "flex", justifyContent: "space-between",
             marginTop: 8, fontSize: 10, color: C.ink2,
             fontFamily: '"IBM Plex Mono", monospace', lineHeight: 1.4,
+            padding: "0 14px",
           }}>
             <span>FD<br/>6.5%</span>
             <span>Debt<br/>7–8%</span>

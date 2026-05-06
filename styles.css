@@ -201,6 +201,29 @@ body {
   cursor: pointer;
   border: 2px solid var(--paper);
 }
+
+/* mobile slider — shrunk by thumb-radius so track matches label range */
+.mobile-slider {
+  -webkit-appearance: none; appearance: none;
+  display: block;
+  width: calc(100% - 28px);
+  margin: 0 14px;
+  height: 4px;
+  background: rgba(120,120,128,0.2);
+  border-radius: 2px;
+  outline: none;
+}
+.mobile-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #fff; cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.22), 0 0 0 0.5px rgba(0,0,0,0.06);
+}
+.mobile-slider::-moz-range-thumb {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: #fff; border: none; cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.22);
+}
 .slider-scale, .rate-scale {
   display: flex; justify-content: space-between;
   font-family: "IBM Plex Mono", monospace;

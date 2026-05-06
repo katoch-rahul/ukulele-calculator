@@ -221,6 +221,7 @@ function GoalScreen({ goal, setGoal, years, setYears, onNext }) {
         </div>
         <div style={{ padding: "0 16px 16px" }}>
           <input
+            className="mobile-slider"
             type="range" min={1} max={30} value={years}
             onChange={(e) => setYears(parseInt(e.target.value))}
           />
@@ -228,7 +229,6 @@ function GoalScreen({ goal, setGoal, years, setYears, onNext }) {
             display: "flex", justifyContent: "space-between",
             marginTop: 6, fontSize: 11, color: C.ink2,
             fontFamily: '"IBM Plex Mono", monospace',
-            padding: "0 14px",
           }}>
             <span>1y</span><span>10y</span><span>20y</span><span>30y</span>
           </div>
@@ -308,6 +308,7 @@ function InflationScreen({ goal, years, inflation, setInflation, onNext, onBack 
         </div>
         <div style={{ padding: "4px 16px 16px" }}>
           <input
+            className="mobile-slider"
             type="range" min={2} max={8} step={0.1} value={inflation}
             onChange={(e) => setInflation(parseFloat(e.target.value))}
           />
@@ -433,6 +434,7 @@ function PlanScreen({ goal, years, inflation, returnRate, setReturnRate, onBack,
         </div>
         <div style={{ padding: "4px 16px 12px" }}>
           <input
+            className="mobile-slider"
             type="range" min={4} max={20} step={0.5} value={returnRate}
             onChange={(e) => setReturnRate(parseFloat(e.target.value))}
           />
@@ -440,7 +442,6 @@ function PlanScreen({ goal, years, inflation, returnRate, setReturnRate, onBack,
             display: "flex", justifyContent: "space-between",
             marginTop: 8, fontSize: 10, color: C.ink2,
             fontFamily: '"IBM Plex Mono", monospace', lineHeight: 1.4,
-            padding: "0 14px",
           }}>
             <span>FD<br/>6.5%</span>
             <span>Debt<br/>7–8%</span>

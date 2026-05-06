@@ -183,14 +183,19 @@ function GoalScreen({ goal, setGoal, years, setYears, onNext }) {
         </div>
         <div style={{
           borderTop: `0.5px solid ${C.ink3}`,
-          padding: "10px 8px 14px",
-          display: "flex", gap: 6,
+          padding: "10px 0 14px",
+          display: "flex", gap: 8, overflowX: "auto",
+          WebkitOverflowScrolling: "touch",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
         }}>
+          <div style={{ width: 16, flexShrink: 0 }} />
           {presets.map((v) => (
-            <button key={v} onClick={() => setGoal(v)} style={{ ...chip(goal === v), flex: 1, textAlign: "center", padding: "7px 4px" }}>
+            <button key={v} onClick={() => setGoal(v)} style={{ ...chip(goal === v), flexShrink: 0 }}>
               {fmtINR(v)}
             </button>
           ))}
+          <div style={{ width: 8, flexShrink: 0 }} />
         </div>
       </div>
 

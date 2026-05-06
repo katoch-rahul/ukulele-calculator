@@ -164,7 +164,7 @@ function ProjectionTable({ years, target, inflationRate, returnRate, monthly }) 
 }
 
 // Main App component
-function App() {
+function DesktopApp() {
   const [goal, setGoal] = useState(100000);
   const [years, setYears] = useState(5);
   const [inflation, setInflation] = useState(4.0);
@@ -473,4 +473,4 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+window.DesktopApp = DesktopApp;

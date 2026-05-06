@@ -478,7 +478,7 @@ function PlanScreen({ goal, years, inflation, returnRate, setReturnRate, onBack,
 }
 
 // ── Root app ──
-function App() {
+function MobileApp() {
   const [step, setStep] = useState(0);
   const [goal, setGoal] = useState(100000);
   const [years, setYears] = useState(5);
@@ -506,4 +506,4 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+window.MobileApp = MobileApp;
